@@ -17,6 +17,20 @@ if (navigator.geolocation) {
    const {latitude, longitude} = pos.coords
 
    console.log(`https://www.google.com/maps/@${latitude},${longitude},15z`)
+
+   const coordinates = [latitude, longitude]
+
+   const map = L.map("map").setView(coordinates, 13)
+
+   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+   }).addTo(map)
+
+   L.marker(coordinates)
+    .addTo(map)
+    .bindPopup("A pretty CSS3 popup.<br> Easily customizable.")
+    .openPopup()
   },
   () => {
    alert("could get your location")
