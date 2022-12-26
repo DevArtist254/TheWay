@@ -11,6 +11,8 @@ const inputDuration = document.querySelector(".form__input--duration")
 const inputCadence = document.querySelector(".form__input--cadence")
 const inputElevation = document.querySelector(".form__input--elevation")
 
+let map, mapEvent
+
 if (navigator.geolocation) {
  navigator.geolocation.getCurrentPosition(
   (pos) => {
@@ -20,7 +22,7 @@ if (navigator.geolocation) {
 
    const coordinates = [latitude, longitude]
 
-   const map = L.map("map").setView(coordinates, 13)
+   map = L.map("map").setView(coordinates, 13)
 
    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
@@ -32,21 +34,25 @@ if (navigator.geolocation) {
     .bindPopup("A pretty CSS3 popup.<br> Easily customizable.")
     .openPopup()
 
-   map.on("click", function (mapEvent) {
-    const {lat, lng} = mapEvent.latlng
-    const popupSettings = {
-     maxWidth: 250,
-     minWidth: 100,
-     autoClose: false,
-     closeOnClick: false,
-     className: "running-popup",
-    }
+   map.on("click", function (mapEvt) {
+    mapEvent = mapEvt
+    form.classList.remove("hidden")
+    inputDistance.focus()
 
-    L.marker([lat, lng])
-     .addTo(map)
-     .bindPopup(L.popup(popupSettings))
-     .setPopupContent("run")
-     .openPopup()
+    // const {lat, lng} = mapEvent.latlng
+    // const popupSettings = {
+    //  maxWidth: 250,
+    //  minWidth: 100,
+    //  autoClose: false,
+    //  closeOnClick: false,
+    //  className: "running-popup",
+    // }
+
+    // L.marker([lat, lng])
+    //  .addTo(map)
+    //  .bindPopup(L.popup(popupSettings))
+    //  .setPopupContent("run")
+    //  .openPopup()
    })
   },
   () => {
@@ -54,3 +60,31 @@ if (navigator.geolocation) {
   }
  )
 }
+
+form.addEventListener("submit", (e) => {
+ e.preventDefault()
+
+ //clear input fields
+ inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value =
+  ""
+
+ //display the marker
+ const {lat, lng} = mapEvent.latlng
+ const popupSettings = {
+  maxWidth: 250,
+  minWidth: 100,
+  autoClose: false,
+  closeOnClick: false,
+  className: "running-popup",
+ }
+ L.marker([lat, lng])
+  .addTo(map)
+  .bindPopup(L.popup(popupSettings))
+  .setPopupContent("run")
+  .openPopup()
+})
+
+inputType.addEventListener("change", () => {
+ inputElevation.closest("form__row").classList.toggle("form__row--hidden")
+ inputCadence.closest("form__row").classList.toggle("form__row--hidden")
+})
